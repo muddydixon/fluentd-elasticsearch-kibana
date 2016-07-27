@@ -15,10 +15,16 @@ RUN apt-get update
 RUN apt-get install elasticsearch
 RUN apt-get install kibana
 
-RUN echo '/etc/init.d/elasticsearch start\n\/opt/kibana/bin/kibana' >> /tmp/start.sh
-RUN chmod +x /tmp/start.sh
+RUN curl -L https://toolbelt.treasuredata.com/sh/install-ubuntu-xenial-td-agent2.sh | sed -e 's/sudo -k//' | sed -e 's/sudo //g' | sh
+RUN td-agent-gem install fluent-plugin-elasticsearch
 
-ENTRYPOINT /tmp/start.sh
+RUN echo '<source>\n  @type forward\n  port 24224\n  0.0.0.0\n</source>\n<match es.**.*>\n  @type elasticsearch\n  host localhost\n  port 9200\n  index_name es\n  include_tag_key true\n  tag_key @log_name\n  logstash_format true\n flus_interval 3s\n</match>' > /etc/td-agent/td-agent.conf
+
+RUN echo 'service td-agent start\n\/etc/init.d/elasticsearch start\n\/opt/kibana/bin/kibana' >> /tmp/start.sh
+RUN chmod +x /tmp/start.sh
 
 EXPOSE 5601
 EXPOSE 9200
+EXPOSE 24224
+
+ENTRYPOINT /tmp/start.sh

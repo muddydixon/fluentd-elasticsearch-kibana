@@ -1,6 +1,11 @@
 fluentd x elasticsearch x kibana Dockerfile
 -----
 
+Docker image containing fluentd, elasticsearch, kibana.
+You send message with fluentd with tag `es.*` to fluentd of this image.
+
+## Easy use
+
 ## How to build
 
 ```zsh
@@ -16,6 +21,7 @@ if you are required http_proxy
 ## How to run
 
 ```zsh
+% docker run -d -p 9200:9200 -p 5601:5601 -p 24224:24224 muddydixon/fluentd-elasticsearch-kibana
 % docker run -d -p 9200:9200 -p 5601:5601 -p 24224:24224 fek
 ```
 
@@ -30,3 +36,14 @@ if you are required http_proxy
 ```
 % open http://192.168.99.100:5601
 ```
+
+## Fluent plugins
+* fluent-plugin-elasticsearch
+* fluent-plugin-forest
+* fluent-plugin-mackerel
+
+## License
+Apache License Version 2.0
+
+## Author
+muddydixon

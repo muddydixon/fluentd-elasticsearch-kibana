@@ -1,5 +1,7 @@
 FROM ubuntu
 
+MAINTAINER muddydixon
+
 ARG HTTP_PROXY=${http_proxy}
 ARG HTTPS_PROXY=${https_proxy}
 
@@ -17,10 +19,10 @@ RUN apt-get install kibana
 
 RUN sed -i -e 's/# network.host: 192.168.0.1/network.host: 0.0.0.0/' /etc/elasticsearch/elasticsearch.yml && sed -i -e 's/# http.port/http.port/' /etc/elasticsearch/elasticsearch.yml
 
-
 RUN curl -L https://toolbelt.treasuredata.com/sh/install-ubuntu-xenial-td-agent2.sh | sed -e 's/sudo -k//' | sed -e 's/sudo //g' | sh
 RUN td-agent-gem install fluent-plugin-elasticsearch
 RUN td-agent-gem install fluent-plugin-forest
+RUN td-agent-gem install fluent-plugin-mackerel
 
 RUN echo '<source>\n  @type forward\n  port 24224\n  0.0.0.0\n</source>\n<match es.**.*>\n  @type forest\n  subtype elasticsearch\n  <template>\n    host localhost\n    port 9200\n    logstash_format true\n    logstash_prefix ${tag}\n    include_tag_key true\n    tag_key @log_name\n    flush_interval 1s\n  </template>\n</match>' > /etc/td-agent/td-agent.conf
 

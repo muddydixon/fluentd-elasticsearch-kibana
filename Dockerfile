@@ -17,6 +17,7 @@ RUN apt-get install kibana
 
 RUN curl -L https://toolbelt.treasuredata.com/sh/install-ubuntu-xenial-td-agent2.sh | sed -e 's/sudo -k//' | sed -e 's/sudo //g' | sh
 RUN td-agent-gem install fluent-plugin-elasticsearch
+RUN td-agent-gem install fluent-plugin-forest
 RUN td-agent-gem install fluent-plugin-mysql-bulk
 
 RUN echo '<source>\n  @type forward\n  port 24224\n  0.0.0.0\n</source>\n<match es.**.*>\n  @type elasticsearch\n  host localhost\n  port 9200\n  index_name es\n  include_tag_key true\n  tag_key @log_name\n  logstash_format true\n flus_interval 3s\n</match>' > /etc/td-agent/td-agent.conf

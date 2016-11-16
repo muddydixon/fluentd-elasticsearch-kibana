@@ -1,4 +1,4 @@
-FROM ubuntu
+FROM ubuntu:16.10
 
 MAINTAINER muddydixon
 
@@ -9,15 +9,12 @@ ENV http_proxy=${HTTP_PROXY}
 ENV https_proxy=${HTTPS_PROXY}
 
 RUN apt-get update
-RUN apt-get install -y wget curl openjdk-8-jdk libmysqlclient-dev make g++
-RUN wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | apt-key add -
-RUN echo "deb http://packages.elastic.co/elasticsearch/2.x/debian stable main" | tee -a /etc/apt/sources.list.d/elasticsearch-2.x.list
+RUN apt-get install -y wget curl make g++ apt-transport-https libmysqlclient-dev openjdk-8-jdk
+RUN wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add -
+RUN echo "deb https://artifacts.elastic.co/packages/5.x/apt stable main" | tee -a /etc/apt/sources.list.d/elasticsearch-5.x.list
 RUN echo "deb http://packages.elastic.co/kibana/4.5/debian stable main" | tee -a /etc/apt/sources.list.d/kibana.list
 RUN apt-get update
-RUN apt-get install elasticsearch
-RUN apt-get install kibana
-
-RUN sed -i -e 's/# network.host: 192.168.0.1/network.host: 0.0.0.0/' /etc/elasticsearch/elasticsearch.yml && sed -i -e 's/# http.port/http.port/' /etc/elasticsearch/elasticsearch.yml
+RUN apt-get install elasticsearch kibana
 
 RUN curl -L https://toolbelt.treasuredata.com/sh/install-ubuntu-xenial-td-agent2.sh | sed -e 's/sudo -k//' | sed -e 's/sudo //g' | sh
 RUN td-agent-gem install fluent-plugin-elasticsearch
@@ -25,10 +22,16 @@ RUN td-agent-gem install fluent-plugin-forest
 RUN td-agent-gem install fluent-plugin-mackerel
 RUN td-agent-gem install fluent-plugin-mysql-bulk
 
-RUN echo '<source>\n  @type forward\n  port 24224\n  bind 0.0.0.0\n</source>\n<match es.**.*>\n  @type forest\n  subtype elasticsearch\n  <template>\n    host localhost\n    port 9200\n    logstash_format true\n    logstash_prefix ${tag}\n    include_tag_key true\n    tag_key @log_name\n    flush_interval 1s\n  </template>\n</match>' > /etc/td-agent/td-agent.conf
+RUN echo "vm.max_map_count=262144" >> /etc/sysctl.conf
+RUN sysctl -p
 
-Run echo 'service td-agent start\n\/etc/init.d/elasticsearch start\n\/opt/kibana/bin/kibana' >> /tmp/start.sh
-RUN chmod +x /tmp/start.sh
+ENV ES_JAVA_OPTS="-Xms1g -Xmx1g"
+
+COPY ./td-agent.conf /etc/td-agent/td-agent.conf
+COPY ./elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
+COPY ./kibana.yml /etc/kibana/kibana.yml
+COPY ./template.json /tmp/template.json
+COPY ./start.sh /tmp/start.sh
 
 EXPOSE 5601
 EXPOSE 9200

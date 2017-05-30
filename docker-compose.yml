@@ -1,0 +1,35 @@
+version: "3"
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.4.0
+    ports:
+      - "9003:9003"
+      - "9200:9200"
+      - "9300:9300"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    restart: always
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:5.4.0
+    ports:
+      - "5601:5601"
+    links:
+      - elasticsearch
+    restart: always
+
+  fluentd:
+    build:
+      context: .
+      dockerfile: Dockerfile.fluentd
+    ports:
+      - "24224:24224"
+    links:
+      - elasticsearch
+    restart: always
+    volumes:
+      - ./fluent.conf:/fluentd/etc/fluent.conf
+    environment:
+      FLUENTD_CONF: fluent.conf

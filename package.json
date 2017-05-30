@@ -1,0 +1,24 @@
+{
+  "name": "fek",
+  "version": "1.0.0",
+  "description": "fluentd x elasticsearch x kibana Dockerfile -----",
+  "main": "sample.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/muddydixon/fluentd-elasticsearch-kibana.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/muddydixon/fluentd-elasticsearch-kibana/issues"
+  },
+  "homepage": "https://github.com/muddydixon/fluentd-elasticsearch-kibana#readme",
+  "dependencies": {
+    "debug": "^2.6.8",
+    "fluent-logger": "^2.4.0"
+  }
+}

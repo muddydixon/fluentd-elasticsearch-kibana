@@ -4,45 +4,27 @@ fluentd x elasticsearch x kibana Dockerfile
 Docker image containing fluentd, elasticsearch, kibana.
 You send message with fluentd with tag `es.*` to fluentd of this image.
 
+## Requirement
+* setup memory [elastic](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#docker-cli-run-prod-mode)
+
+## Default password
+* kibana
+    * kibana/changeme [elastic](https://www.elastic.co/guide/en/x-pack/current/setting-up-authentication.html#built-in-users)
+
+
+## configure elasticsearch
+* https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#docker-configuration-methods
+
 ## Easy use
 
 ```zsh
-docker run -d --privileged  -p 5601:5601 -p 9200:9200 -p 24224:24224 muddydixon/fluentd-elasticsearch-kibana
+docker-compose up -d
 ```
-
-Using your `td-agent.conf`
-
-```zsh
-docker run -d --privileged  -p 5601:5601 -p 9200:9200 -p 24224:24224 -v ${TD_AGENT_CONF_PATH}:/etc/td-agent/td-agent.conf muddydixon/fluentd-elasticsearch-kibana
-```
-
-`elasticsearch.yml` or `kibana.yml` are same:
-
-* to `/etc/elasticsearch/elasticsearch.yml`
-* to `/etc/kibana/kibana.yml`
 
 ### Version
-* elasticsearch 5.X
-* kibana 4.5
+* elasticsearch 5.4.0
+* kibana 5.4.0
 * td-agent2
-
-## How to build
-
-```zsh
-% docker build --rm .
-```
-
-if you are required http_proxy
-
-```zsh
-% docker build --rm --build-arg http_proxy=${http_proxy} --build-arg https_proxy=${https_proxy} .
-```
-
-## How to run
-
-```zsh
-% docker run -d -p 9200:9200 -p 5601:5601 -p 24224:24224 muddydixon/fluentd-elasticsearch-kibana
-```
 
 ## Try it
 
@@ -58,12 +40,9 @@ if you are required http_proxy
 
 ## Fluent plugins
 * fluent-plugin-elasticsearch
+* fluent-plugin-secure-forward
 * fluent-plugin-forest
 * fluent-plugin-mackerel
-* fluent-plugin-mysql-bulk
-
-## License
-Apache License Version 2.0
 
 ## Author
 muddydixon
